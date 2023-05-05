@@ -1,6 +1,7 @@
 #include <Preferences.h>
 #include <ELECHOUSE_CC1101_SRC_DRV.h>
 #include <SPI.h>
+#include "Tcp.h"
 #include "Utils.h"
 #include "ConfigSettings.h"
 #include "Somfy.h"
@@ -12,6 +13,7 @@ extern Preferences pref;
 extern SomfyShadeController somfy;
 extern SocketEmitter sockEmit;
 extern MQTTClass mqtt;
+std::vector<AsyncClient*> clients;
 
 
 uint8_t rxmode = 0;  // Indicates whether the radio is in receive mode.  Just to ensure there isn't more than one interrupt hooked.
@@ -837,6 +839,7 @@ void SomfyShade::emitState(uint8_t num, const char *evt) {
   else
     snprintf(buf, sizeof(buf), "{\"shadeId\":%d,\"type\":%u,\"remoteAddress\":%d,\"name\":\"%s\",\"direction\":%d,\"position\":%d,\"target\":%d,\"mypos\":%d,\"tiltType\":%u}", 
       this->shadeId, static_cast<uint8_t>(this->shadeType), this->getRemoteAddress(), this->name, this->direction, static_cast<uint8_t>(floor(this->currentPos)), static_cast<uint8_t>(floor(this->target)), static_cast<int8_t>(floor(this->myPos)), static_cast<uint8_t>(this->tiltType));
+  wifi_debug(buf);
   if(num >= 255) sockEmit.sendToClients(evt, buf);
   else sockEmit.sendToClient(num, evt, buf);
   if(mqtt.connected()) {
