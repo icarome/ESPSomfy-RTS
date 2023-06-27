@@ -35,7 +35,7 @@ void Web::loop() {
   apiServer.handleClient();
   server.handleClient();
 }
-void Web::sendCORSHeaders() { 
+void Web::sendCORSHeaders() {
     //server.sendHeader(F("Access-Control-Allow-Origin"), F("*"));
     //server.sendHeader(F("Access-Control-Max-Age"), F("600"));
     //server.sendHeader(F("Access-Control-Allow-Methods"), F("PUT,POST,GET,OPTIONS"));
@@ -53,6 +53,10 @@ void Web::begin() {
   apiServer.enableCORS(true);
   apiServer.on("/discovery", []() {
     HTTPMethod method = apiServer.method();
+    if(method == 6){
+      apiServer.send(204, "*\\*", "");
+      return;
+    }
     if (method == HTTP_POST || method == HTTP_GET) {
       Serial.println("Discovery Requested");
       DynamicJsonDocument doc(16384);
@@ -70,6 +74,10 @@ void Web::begin() {
   apiServer.on("/shades", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = apiServer.method();
+    if(method == 6){
+      apiServer.send(204, "*\\*", "");
+      return;
+    }
     if (method == HTTP_POST || method == HTTP_GET) {
       DynamicJsonDocument doc(16384);
       JsonArray arr = doc.to<JsonArray>();
@@ -116,9 +124,14 @@ void Web::begin() {
   apiServer.on("/shadeCommand", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = apiServer.method();
+    if(method == 6){
+      apiServer.send(204, "*\\*", "");
+      return;
+    }
     uint8_t shadeId = 255;
     uint8_t target = 255;
     uint8_t repeat = 1;
+    Serial.println(method);
     somfy_commands command = somfy_commands::My;
     if (method == HTTP_GET || method == HTTP_PUT || method == HTTP_POST) {
       if (apiServer.hasArg("shadeId")) {
@@ -183,6 +196,10 @@ void Web::begin() {
   apiServer.on("/tiltCommand", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = apiServer.method();
+    if(method == 6){
+      apiServer.send(204, "*\\*", "");
+      return;
+    }
     uint8_t shadeId = 255;
     uint8_t target = 255;
     somfy_commands command = somfy_commands::My;
@@ -285,7 +302,7 @@ void Web::begin() {
     }
     server.streamFile(file, _encoding_text);
     file.close();
-    
+
   });
   server.on("/shades.tmp", []() {
     webServer.sendCORSHeaders();
@@ -396,7 +413,7 @@ void Web::begin() {
   server.on("/favicon.png", []() {
     webServer.sendCacheHeaders(604800);
     webServer.sendCORSHeaders();
-    
+
     // Load the index html page from the data directory.
     Serial.println("Loading file favicon.png");
     File file = LittleFS.open("/favicon.png", "r");
@@ -410,7 +427,7 @@ void Web::begin() {
   server.on("/icon.png", []() {
     webServer.sendCacheHeaders(604800);
     webServer.sendCORSHeaders();
-    
+
     // Load the index html page from the data directory.
     Serial.println("Loading file favicon.png");
     File file = LittleFS.open("/icon.png", "r");
@@ -447,6 +464,10 @@ void Web::begin() {
   server.on("/controller", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     if (method == HTTP_POST || method == HTTP_GET) {
       DynamicJsonDocument doc(16384);
       somfy.toJSON(doc);
@@ -458,6 +479,10 @@ void Web::begin() {
   server.on("/shades", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     if (method == HTTP_POST || method == HTTP_GET) {
       DynamicJsonDocument doc(16384);
       JsonArray arr = doc.to<JsonArray>();
@@ -469,6 +494,11 @@ void Web::begin() {
     });
   server.on("/getNextShade", []() {
     webServer.sendCORSHeaders();
+    HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     StaticJsonDocument<128> doc;
     uint8_t shadeId = somfy.getNextShadeId();
     JsonObject obj = doc.to<JsonObject>();
@@ -480,6 +510,10 @@ void Web::begin() {
     });
   server.on("/addShade", []() {
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     SomfyShade* shade;
     if (method == HTTP_POST || method == HTTP_PUT) {
       Serial.println("Adding a shade");
@@ -536,6 +570,10 @@ void Web::begin() {
   server.on("/shade", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     if (method == HTTP_GET) {
       if (server.hasArg("shadeId")) {
         int shadeId = atoi(server.arg("shadeId").c_str());
@@ -596,6 +634,10 @@ void Web::begin() {
   server.on("/saveShade", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     if (method == HTTP_PUT || method == HTTP_POST) {
       // We are updating an existing shade.
       if (server.hasArg("plain")) {
@@ -639,6 +681,10 @@ void Web::begin() {
   server.on("/tiltCommand", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     uint8_t shadeId = 255;
     uint8_t target = 255;
     somfy_commands command = somfy_commands::My;
@@ -703,9 +749,14 @@ void Web::begin() {
   server.on("/shadeCommand", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     uint8_t shadeId = 255;
     uint8_t target = 255;
     uint8_t repeat = 1;
+    Serial.println(method);
     somfy_commands command = somfy_commands::My;
     if (method == HTTP_GET || method == HTTP_PUT || method == HTTP_POST) {
       if (server.hasArg("shadeId")) {
@@ -770,6 +821,10 @@ void Web::begin() {
   server.on("/setMyPosition", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     uint8_t shadeId = 255;
     int8_t pos = -1;
     int8_t tilt = -1;
@@ -825,6 +880,10 @@ void Web::begin() {
   server.on("/setRollingCode", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     if (method == HTTP_PUT || method == HTTP_POST) {
       uint8_t shadeId = 255;
       uint16_t rollingCode = 0;
@@ -969,6 +1028,10 @@ void Web::begin() {
   server.on("/unpairShade", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     if (method == HTTP_PUT || method == HTTP_POST) {
       uint8_t shadeId = 255;
       if (server.hasArg("plain")) {
@@ -1018,6 +1081,10 @@ void Web::begin() {
   server.on("/unlinkRemote", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     if (method == HTTP_PUT || method == HTTP_POST) {
       // We are updating an existing shade by adding a linked remote.
       if (server.hasArg("plain")) {
@@ -1064,6 +1131,10 @@ void Web::begin() {
   server.on("/linkRemote", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     if (method == HTTP_PUT || method == HTTP_POST) {
       // We are updating an existing shade by adding a linked remote.
       if (server.hasArg("plain")) {
@@ -1112,6 +1183,10 @@ void Web::begin() {
   server.on("/deleteShade", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     uint8_t shadeId = 255;
     if (method == HTTP_GET || method == HTTP_PUT || method == HTTP_POST) {
       if (server.hasArg("shadeId")) {
@@ -1272,6 +1347,10 @@ void Web::begin() {
   server.on("/reboot", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     if (method == HTTP_POST || method == HTTP_PUT) {
       Serial.println("Rebooting ESP...");
       rebootDelay.reboot = true;
@@ -1321,6 +1400,10 @@ void Web::begin() {
   server.on("/sendRemoteCommand", []() {
     webServer.sendCORSHeaders();
     HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     if (method == HTTP_GET || method == HTTP_PUT || method == HTTP_POST) {
       somfy_frame_t frame;
       uint8_t repeats = 0;
@@ -1369,6 +1452,11 @@ void Web::begin() {
     });
   server.on("/setgeneral", []() {
     webServer.sendCORSHeaders();
+    HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     int statusCode = 200;
     DynamicJsonDocument doc(256);
     DeserializationError err = deserializeJson(doc, server.arg("plain"));
@@ -1380,7 +1468,6 @@ void Web::begin() {
     }
     else {
       JsonObject obj = doc.as<JsonObject>();
-      HTTPMethod method = server.method();
       if (method == HTTP_POST || method == HTTP_PUT) {
         // Parse out all the inputs.
         if (obj.containsKey("hostname") || obj.containsKey("ssdpBroadcast")) {
@@ -1400,6 +1487,11 @@ void Web::begin() {
     });
   server.on("/setNetwork", []() {
     webServer.sendCORSHeaders();
+    HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     DynamicJsonDocument doc(1024);
     DeserializationError err = deserializeJson(doc, server.arg("plain"));
     if (err) {
@@ -1410,7 +1502,6 @@ void Web::begin() {
     }
     else {
       JsonObject obj = doc.as<JsonObject>();
-      HTTPMethod method = server.method();
       if (method == HTTP_POST || method == HTTP_PUT) {
         // Parse out all the inputs.
         bool reboot = false;
@@ -1431,7 +1522,7 @@ void Web::begin() {
         JsonObject objEth = obj["ethernet"];
         settings.WIFI.fromJSON(objWifi);
         settings.Ethernet.fromJSON(objEth);
-      
+
         settings.WIFI.save();
         settings.Ethernet.save();
         if (reboot) {
@@ -1448,6 +1539,11 @@ void Web::begin() {
   });
   server.on("/connectwifi", []() {
     webServer.sendCORSHeaders();
+    HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     int statusCode = 200;
     Serial.println("Settings WIFI connection...");
     DynamicJsonDocument doc(512);
@@ -1460,7 +1556,6 @@ void Web::begin() {
     }
     else {
       JsonObject obj = doc.as<JsonObject>();
-      HTTPMethod method = server.method();
       //Serial.print(F("HTTP Method: "));
       //Serial.println(server.method());
       if (method == HTTP_POST || method == HTTP_PUT) {
@@ -1547,6 +1642,11 @@ void Web::begin() {
     });
   server.on("/mqttsettings", []() {
     webServer.sendCORSHeaders();
+    HTTPMethod method = server.method();
+    if(method == 6){
+      server.send(204, "*\\*", "");
+      return;
+    }
     DynamicJsonDocument doc(512);
     JsonObject obj = doc.to<JsonObject>();
     settings.MQTT.toJSON(obj);
